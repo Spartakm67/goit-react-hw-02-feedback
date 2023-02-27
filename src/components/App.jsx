@@ -1,92 +1,59 @@
-import { Component } from 'react';
-import { Container } from './App.styled';
-import { Foreva } from './Toggle.styled';
+import React, { Component } from 'react';
+import { Container } from "./App.styled"; 
 
-export const App = () => {
-  return (
-    <Container>
-      TERRA FOOD
-      <Toggle ><Foreva>FOREVA</Foreva></Toggle >
-      
-    </Container >
-  );
-};
+import { Statistics } from './Statistics/Statistics';
+import { FeedbackOptions } from './FeedbackOptions/FeedbackOptions';
+import { Section } from './Section/Section';
+import { Notification } from './Notification/Notification';
 
-class Toggle extends Component {
-  state = { isOpen: false };
+export class App extends Component {
+  state = {
+    good: 0,
+    neutral: 0,
+    bad: 0,
+  };
 
-  show = () => this.setState({ isOpen: true });
+  onLeaveFeedback = option => {
+    this.setState(state => ({
+      [option]: state[option] + 1,
+    }));
+  };
 
-  hide = () => this.setState({ isOpen: false });
+  countTotalFeedback = () => {
+    const { good, neutral, bad } = this.state;
+    return good + neutral + bad;
+  };
+
+  countPositiveFeedbackPercentage = () => {
+    return Math.round((this.state.good / this.countTotalFeedback()) * 100);
+  };
 
   render() {
-    const { isOpen } = this.state;
-    const { children } = this.props;
-
+    const { good, neutral, bad } = this.state;
     return (
-      <>
-        <button onClick={this.show}>Show</button>
-        <button onClick={this.hide}>Hide</button>
-        {isOpen && children}
-      </>
+      <Container>
+        <Section title="Please leave feedback">
+          <FeedbackOptions
+            options={Object.keys(this.state)}
+            onLeaveFeedback={this.onLeaveFeedback}
+          ></FeedbackOptions>
+        </Section>
+          {this.countTotalFeedback() > 0 ? (
+          <Section title="Statictics">
+            <Statistics
+              good={good}
+              neutral={neutral}
+              bad={bad}
+              total={this.countTotalFeedback()}
+              positivePercentage={this.countPositiveFeedbackPercentage()}
+            />
+          </Section>
+        ) : (
+          <Notification message="There is no feedback" />
+        )}
+        
+      </Container>
     );
   }
 }
 
-// class Toggle extends Component {
-//   state = { isOpen: false };
-
-//   toggle = () => {
-//     this.setState(state => ({ isOpen: !state.isOpen }));
-//   };
-
-//   render() {
-//     const { isOpen } = this.state;
-//     const { children } = this.props;
-
-//     return (
-//       <div>
-//         <button onClick={this.toggle}>{isOpen ? "Hide" : "Show"}</button>
-//         {isOpen && children}
-//       </div>
-//     );
-//   }
-// }
-//===============================================================//
-
-// export const App = () => {
-//   return (
-//     <Container>
-//       <Toggle ></Toggle >
-//     </Container >
-//   );
-// };
-
-// const Button = ({ changeMessage, label }) => (
-//   <button type="button" onClick={changeMessage}>
-//     {label}
-//   </button>
-// );
-
-// class Toggle extends Component {
-//   state = {
-//     message: new Date().toLocaleTimeString(),
-//   };
-
-//   // Метод, який будемо передавати в Button для виклику під час кліку
-//   updateMessage = evt => {
-//     console.log(evt); // Доступний об'єкт події
-//     this.setState({
-//       message: new Date().toLocaleTimeString(),
-//     });
-//   };
-
-//   render() {
-//     return (
-//       <>
-//         <span>{this.state.message}</span>
-//         <Button label="Change message" changeMessage={this.updateMessage} />
-//       </>
-//     );
-//   }
-// }
